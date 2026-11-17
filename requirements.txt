@@ -1,0 +1,2 @@
+# The application uses only the Python standard library (Python 3.9+).
+# No third-party packages are required to run it or its unit tests.
