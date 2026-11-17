@@ -1,7 +1,7 @@
 # FleetBook - Travel, Transport & Fleet Booking System
 
-**Course:** Software Engineering - Assignment 2 (Mini-Project Implementation using Git)
-**Student:** Sharmila Mai C.M | **Register No:** 2503917720522221
+**Course:** B.Tech | **Subject:** Software Engineering - Assignment 2 (Mini-Project Implementation using Git)
+**Student:** C.M.Sharmila Mai | **Register No:** 2503917720522221
 
 FleetBook is a command-line application that manages a transport fleet (buses, vans, cars),
 the routes they serve, scheduled trips, and customer seat bookings with fare calculation
@@ -120,7 +120,7 @@ application prints a clear error and exits with a non-zero code instead of crash
 ## Team Details and Individual Contributions
 
 Individual project. All design, implementation, testing and documentation:
-Sharmila Mai C.M (Reg. No. 2503917720522221).
+C.M.Sharmila Mai (Reg. No. 2503917720522221).
 
 ## Known Limitations and Future Enhancements
 
