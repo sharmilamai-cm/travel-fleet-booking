@@ -1,5 +1,6 @@
 """Core business logic: fleet, routes, trip scheduling and seat booking."""
 
+from datetime import datetime
 from typing import List, Optional
 
 from .models import Booking, Route, Trip, Vehicle
@@ -18,6 +19,9 @@ from .validation import (
 )
 
 FULL_VEHICLE_DISCOUNT = 0.10   # 10% off when a whole vehicle is hired
+
+# Refund policy: (minimum hours before departure, refund fraction)
+REFUND_POLICY = ((48, 0.90), (24, 0.50), (0, 0.0))
 
 
 class NotFoundError(LookupError):
@@ -165,3 +169,29 @@ class FleetBookingSystem:
             if item["id"] == booking_id:
                 return Booking.from_dict(item)
         raise NotFoundError(f"Booking {booking_id} not found.")
+
+    # ---------- cancellation ----------
+    def refund_fraction(self, trip: Trip, now: Optional[datetime] = None) -> float:
+        now = now or datetime.now()
+        departure = datetime.strptime(f"{trip.date} {trip.departure_time}", "%Y-%m-%d %H:%M")
+        hours_left = (departure - now).total_seconds() / 3600
+        if hours_left < 0:
+            raise BookingError("The trip has already departed; it cannot be cancelled.")
+        for min_hours, fraction in REFUND_POLICY:
+            if hours_left >= min_hours:
+                return fraction
+        return 0.0
+
+    def cancel_booking(self, booking_id, now: Optional[datetime] = None) -> Booking:
+        booking = self.get_booking(int(booking_id))
+        if booking.status == "CANCELLED":
+            raise BookingError(f"Booking {booking.id} is already cancelled.")
+        trip = self.get_trip(booking.trip_id)
+        fraction = self.refund_fraction(trip, now)
+        booking.status = "CANCELLED"
+        booking.refund = round(booking.fare * fraction, 2)
+        for index, item in enumerate(self.db["bookings"]):
+            if item["id"] == booking.id:
+                self.db["bookings"][index] = booking.to_dict()
+        self._save()
+        return booking
