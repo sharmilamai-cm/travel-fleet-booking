@@ -50,6 +50,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--phone", required=True)
     p.add_argument("--seats", required=True)
 
+    p = sub.add_parser("cancel", help="cancel a booking and compute the refund")
+    p.add_argument("--booking", required=True)
+
     sub.add_parser("list-bookings", help="show all bookings")
     return parser
 
@@ -102,9 +105,12 @@ def run(args, system: FleetBookingSystem) -> None:
     elif cmd == "book":
         b = system.book_seats(args.trip, args.name, args.phone, args.seats)
         print(f"Booking confirmed: #{b.id} for {b.customer_name}, {b.seats} seat(s), fare Rs.{b.fare:.2f}")
+    elif cmd == "cancel":
+        b = system.cancel_booking(args.booking)
+        print(f"Booking #{b.id} cancelled. Refund: Rs.{b.refund:.2f} of Rs.{b.fare:.2f}")
     elif cmd == "list-bookings":
-        _print_table(["ID", "Trip", "Customer", "Seats", "Fare", "Status"],
-                     [(b.id, b.trip_id, b.customer_name, b.seats, f"{b.fare:.2f}", b.status)
+        _print_table(["ID", "Trip", "Customer", "Seats", "Fare", "Status", "Refund"],
+                     [(b.id, b.trip_id, b.customer_name, b.seats, f"{b.fare:.2f}", b.status, f"{b.refund:.2f}")
                       for b in system.list_bookings()])
 
 
